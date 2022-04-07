@@ -6,6 +6,8 @@ import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.shared.Utils;
 import learn.springws.restfulws.shared.dto.UserDto;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +40,11 @@ public class UserServiceImpl implements UserService {
         UserDto result = new UserDto();
         BeanUtils.copyProperties(storedUser, result);
         return result;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // todo: implement later
+        return null;
     }
 }
