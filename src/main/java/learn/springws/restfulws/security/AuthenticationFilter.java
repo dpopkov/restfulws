@@ -7,6 +7,7 @@ import learn.springws.restfulws.RestfulwsApplicationContext;
 import learn.springws.restfulws.rest.model.request.UserLoginRequestModel;
 import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.service.impl.UserServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 
+@Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -32,6 +34,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+        log.trace("attemptAuthentication(..)");
         try {
             UserLoginRequestModel credentials = new ObjectMapper()
                     .readValue(request.getInputStream(), UserLoginRequestModel.class);
@@ -50,6 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) {
+        log.trace("successfulAuthentication(..)");
         String emailAsUserName = ((User) authResult.getPrincipal()).getUsername();
         String token = Jwts.builder()
                 .setSubject(emailAsUserName)
