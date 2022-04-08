@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -42,9 +44,17 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    /**
+     * Locates the user based on the email.
+     * @param email in the case of this application the username is email address actually
+     * @return a fully populated user record
+     * @throws UsernameNotFoundException if the user could not be found
+     */
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // todo: implement later
-        return null;
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Can not find user by email " + email));
+        return new org.springframework.security.core.userdetails.User(
+                userEntity.getEmail(), userEntity.getEncryptedPassword(), Collections.emptyList());
     }
 }
