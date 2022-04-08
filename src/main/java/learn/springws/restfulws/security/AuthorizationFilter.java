@@ -39,7 +39,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             token = token.substring(SecurityConstants.TOKEN_PREFIX.length());
             String emailAsUsername = Jwts.parser()
-                    .setSigningKey(SecurityConstants.TOKEN_SECRET)
+                    .setSigningKey(SecurityConstants.getTokenSecret())
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
