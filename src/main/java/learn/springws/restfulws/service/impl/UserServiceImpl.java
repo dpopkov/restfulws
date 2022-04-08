@@ -53,6 +53,15 @@ public class UserServiceImpl implements UserService {
         return dto;
     }
 
+    @Override
+    public UserDto getUserByPublicId(String publicId) {
+        UserEntity entity = userRepository.findByUserId(publicId)
+                .orElseThrow(() -> new RuntimeException("Cannot find user by public id " + publicId));
+        UserDto dto = new UserDto();
+        BeanUtils.copyProperties(entity, dto);
+        return dto;
+    }
+
     /**
      * Locates the user based on the email.
      * @param email in the case of this application the username is email address actually
