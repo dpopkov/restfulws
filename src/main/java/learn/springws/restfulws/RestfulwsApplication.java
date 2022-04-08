@@ -16,4 +16,13 @@ public class RestfulwsApplication {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    /*
+     This application context bean is added to config in order to initialize RestfulwsApplicationContext bean
+     and be able to use its static fields in static method calls, e.g to get beans in AuthenticationFilter.
+     */
+    @Bean
+    public RestfulwsApplicationContext restfulwsApplicationContext() {
+        return new RestfulwsApplicationContext();
+    }
 }

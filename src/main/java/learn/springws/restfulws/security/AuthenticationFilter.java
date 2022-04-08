@@ -3,7 +3,10 @@ package learn.springws.restfulws.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import learn.springws.restfulws.RestfulwsApplicationContext;
 import learn.springws.restfulws.rest.model.request.UserLoginRequestModel;
+import learn.springws.restfulws.service.UserService;
+import learn.springws.restfulws.service.impl.UserServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,12 +50,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) {
-        String userName = ((User) authResult.getPrincipal()).getUsername();
+        String emailAsUserName = ((User) authResult.getPrincipal()).getUsername();
         String token = Jwts.builder()
-                .setSubject(userName)
+                .setSubject(emailAsUserName)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
+        UserService userService = RestfulwsApplicationContext.getBean(UserServiceImpl.class);
+        String publicUserId = userService.getUserByEmail(emailAsUserName).getUserId();
         response.addHeader(SecurityConstants.TOKEN_HEADER, SecurityConstants.TOKEN_PREFIX + token);
+        response.addHeader("UserID", publicUserId);
     }
 }
