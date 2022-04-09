@@ -2,6 +2,7 @@ package learn.springws.restfulws.rest.model.response;
 
 public enum ErrorMessages {
     MISSING_REQUIRED_FIELD("Missing required field. Please check documentation for required fields"),
+    USER_ALREADY_EXISTS("User already exists"),
     RECORD_ALREADY_EXISTS("Record already exists"),
     INTERNAL_SERVER_ERROR("Internal server error"),
     NO_RECORD_FOUND("Record with provided id is not found"),

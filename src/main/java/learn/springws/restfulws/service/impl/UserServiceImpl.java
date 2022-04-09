@@ -2,7 +2,9 @@ package learn.springws.restfulws.service.impl;
 
 import learn.springws.restfulws.data.entity.UserEntity;
 import learn.springws.restfulws.data.repository.UserRepository;
+import learn.springws.restfulws.rest.model.response.ErrorMessages;
 import learn.springws.restfulws.service.UserService;
+import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.shared.Utils;
 import learn.springws.restfulws.shared.dto.UserDto;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new UserServiceException(ErrorMessages.USER_ALREADY_EXISTS);
         }
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(dto, entity);
