@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,6 +44,21 @@ public class UserServiceImpl implements UserService {
         UserEntity storedUser = userRepository.save(entity);
         UserDto result = new UserDto();
         BeanUtils.copyProperties(storedUser, result);
+        return result;
+    }
+
+    @Override
+    public UserDto updateUser(String userId, UserDto dto) {
+        Optional<UserEntity> byUserId = userRepository.findByUserId(userId);
+        if (byUserId.isEmpty()) {
+            throw new UserServiceException(ErrorMessages.NO_USER_FOUND);
+        }
+        UserEntity entity = byUserId.get();
+        entity.setFirstName(dto.getFirstName());
+        entity.setLastName(dto.getLastName());
+        UserEntity updated = userRepository.save(entity);
+        UserDto result = new UserDto();
+        BeanUtils.copyProperties(updated, result);
         return result;
     }
 

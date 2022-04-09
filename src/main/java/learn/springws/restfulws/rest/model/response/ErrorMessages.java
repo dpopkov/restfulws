@@ -5,6 +5,7 @@ public enum ErrorMessages {
     USER_ALREADY_EXISTS("User already exists"),
     RECORD_ALREADY_EXISTS("Record already exists"),
     INTERNAL_SERVER_ERROR("Internal server error"),
+    NO_USER_FOUND("User with provided email is not found"),
     NO_RECORD_FOUND("Record with provided id is not found"),
     AUTHENTICATION_FAILED("Authentication failed"),
     COULD_NOT_UPDATE_RECORD("Could not update record"),

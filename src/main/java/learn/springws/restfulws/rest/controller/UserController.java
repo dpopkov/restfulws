@@ -42,9 +42,17 @@ public class UserController {
         return returnUser;
     }
 
-    @PutMapping
-    public String updateUser() {
-        return "updateUser was called";
+    @PutMapping("/{userPublicId}")
+    public UserRest updateUser(@PathVariable String userPublicId, @RequestBody UserDetailsRequestModel user) {
+        if (anyFieldIsMissing(user.getFirstName(), user.getLastName())) {
+            throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD);
+        }
+        UserDto dto = new UserDto();
+        BeanUtils.copyProperties(user, dto);
+        UserDto updated = userService.updateUser(userPublicId, dto);
+        UserRest returnUser = new UserRest();
+        BeanUtils.copyProperties(updated, returnUser);
+        return returnUser;
     }
 
     @DeleteMapping
