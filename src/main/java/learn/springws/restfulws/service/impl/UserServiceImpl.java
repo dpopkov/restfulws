@@ -8,13 +8,18 @@ import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.shared.Utils;
 import learn.springws.restfulws.shared.dto.UserDto;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,6 +34,18 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.utils = utils;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    /** Returns page of users where number of page starts from 0. */
+    @Override
+    public List<UserDto> getUsers(int page, int limit) {
+        Pageable pageableRequest = PageRequest.of(page, limit);
+        Page<UserEntity> usersPage = userRepository.findAll(pageableRequest);
+        return usersPage.getContent().stream().map(entity -> {
+            UserDto dto = new UserDto();
+            BeanUtils.copyProperties(entity, dto);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override

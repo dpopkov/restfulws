@@ -12,6 +12,9 @@ import learn.springws.restfulws.shared.dto.UserDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static learn.springws.restfulws.shared.Utils.*;
 
 @RestController
@@ -22,6 +25,18 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping
+    public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
+                                   @RequestParam(value = "limit", defaultValue = "5") int limit) {
+        page = page - 1; // number of page starts from 0, not from 1 (zero indexing)
+        List<UserDto> usersDto = userService.getUsers(page, limit);
+        return usersDto.stream().map(dto -> {
+            UserRest user = new UserRest();
+            BeanUtils.copyProperties(dto, user);
+            return user;
+        }).collect(Collectors.toList());
     }
 
     @GetMapping("/{userPublicId}")
