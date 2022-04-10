@@ -1,8 +1,11 @@
 package learn.springws.restfulws.rest.controller;
 
 import learn.springws.restfulws.exceptions.UserServiceException;
+import learn.springws.restfulws.rest.model.OperationName;
 import learn.springws.restfulws.rest.model.request.UserDetailsRequestModel;
 import learn.springws.restfulws.rest.model.response.ErrorMessages;
+import learn.springws.restfulws.rest.model.response.OperationStatus;
+import learn.springws.restfulws.rest.model.response.OperationResult;
 import learn.springws.restfulws.rest.model.response.UserRest;
 import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.shared.dto.UserDto;
@@ -55,8 +58,9 @@ public class UserController {
         return returnUser;
     }
 
-    @DeleteMapping
-    public String deleteUser() {
-        return "deleteUser was called";
+    @DeleteMapping("/{userPublicId}")
+    public OperationStatus deleteUser(@PathVariable String userPublicId) {
+        userService.deleteUser(userPublicId);
+        return new OperationStatus(OperationResult.SUCCESS, OperationName.DELETE);
     }
 }

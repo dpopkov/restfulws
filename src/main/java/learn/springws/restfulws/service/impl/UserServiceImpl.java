@@ -63,6 +63,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteUser(String userId) {
+        Optional<UserEntity> byUserId = userRepository.findByUserId(userId);
+        if (byUserId.isEmpty()) {
+            throw new UserServiceException(ErrorMessages.NO_USER_FOUND);
+        }
+        userRepository.deleteById(byUserId.get().getId());
+    }
+
+    @Override
     public UserDto getUserByEmail(String email) {
         UserEntity entity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("Cannot find user by email " + email));
