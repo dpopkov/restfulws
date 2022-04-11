@@ -9,7 +9,6 @@ import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.shared.Utils;
 import learn.springws.restfulws.shared.dto.UserDto;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,11 +43,9 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers(int page, int limit) {
         Pageable pageableRequest = PageRequest.of(page, limit);
         Page<UserEntity> usersPage = userRepository.findAll(pageableRequest);
-        return usersPage.getContent().stream().map(entity -> {
-            UserDto dto = new UserDto();
-            BeanUtils.copyProperties(entity, dto);
-            return dto;
-        }).collect(Collectors.toList());
+        return usersPage.getContent().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,9 +78,7 @@ public class UserServiceImpl implements UserService {
         entity.setFirstName(dto.getFirstName());
         entity.setLastName(dto.getLastName());
         UserEntity updated = userRepository.save(entity);
-        UserDto result = new UserDto();
-        BeanUtils.copyProperties(updated, result);
-        return result;
+        return entityToDto(updated);
     }
 
     @Override
@@ -94,22 +90,19 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(byUserId.get().getId());
     }
 
+    @Transactional
     @Override
     public UserDto getUserByEmail(String email) {
         UserEntity entity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("Cannot find user by email " + email));
-        UserDto dto = new UserDto();
-        BeanUtils.copyProperties(entity, dto);
-        return dto;
+        return entityToDto(entity);
     }
 
     @Override
     public UserDto getUserByPublicId(String publicId) {
         UserEntity entity = userRepository.findByUserId(publicId)
                 .orElseThrow(() -> new RuntimeException("Cannot find user by public id " + publicId));
-        UserDto dto = new UserDto();
-        BeanUtils.copyProperties(entity, dto);
-        return dto;
+        return entityToDto(entity);
     }
 
     /**
@@ -124,5 +117,10 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Can not find user by email " + email));
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getEmail(), userEntity.getEncryptedPassword(), Collections.emptyList());
+    }
+
+    private UserDto entityToDto(UserEntity entity) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(entity, UserDto.class);
     }
 }

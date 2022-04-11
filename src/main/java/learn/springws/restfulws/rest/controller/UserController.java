@@ -44,9 +44,9 @@ public class UserController {
 
     @GetMapping("/{userPublicId}")
     public UserRest getUser(@PathVariable String userPublicId) {
-        UserRest returnUser = new UserRest();
         UserDto dto = userService.getUserByPublicId(userPublicId);
-        BeanUtils.copyProperties(dto, returnUser);
+        ModelMapper mapper = new ModelMapper();
+        UserRest returnUser = mapper.map(dto, UserRest.class);
         return returnUser;
     }
 
