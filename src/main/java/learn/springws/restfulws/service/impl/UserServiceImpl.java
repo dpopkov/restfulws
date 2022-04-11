@@ -1,5 +1,6 @@
 package learn.springws.restfulws.service.impl;
 
+import learn.springws.restfulws.data.entity.AddressEntity;
 import learn.springws.restfulws.data.entity.UserEntity;
 import learn.springws.restfulws.data.repository.UserRepository;
 import learn.springws.restfulws.rest.model.response.ErrorMessages;
@@ -7,6 +8,7 @@ import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.shared.Utils;
 import learn.springws.restfulws.shared.dto.UserDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,15 +55,19 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new UserServiceException(ErrorMessages.USER_ALREADY_EXISTS);
         }
-        UserEntity entity = new UserEntity();
-        BeanUtils.copyProperties(dto, entity);
+        ModelMapper mapper = new ModelMapper();
+        UserEntity entity = mapper.map(dto, UserEntity.class);
         String publicUserId = utils.generateUserId(PUBLIC_USER_ID_LENGTH);
         entity.setUserId(publicUserId);
         entity.setEncryptedPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+        if (entity.getAddresses() != null) {
+            for (AddressEntity addressEntity : entity.getAddresses()) {
+                addressEntity.setUserDetails(entity);
+                addressEntity.setPublicId(utils.generatePublicId());
+            }
+        }
         UserEntity storedUser = userRepository.save(entity);
-        UserDto result = new UserDto();
-        BeanUtils.copyProperties(storedUser, result);
-        return result;
+        return mapper.map(storedUser, UserDto.class);
     }
 
     @Override

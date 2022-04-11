@@ -9,6 +9,7 @@ import learn.springws.restfulws.rest.model.response.OperationResult;
 import learn.springws.restfulws.rest.model.response.UserRest;
 import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.shared.dto.UserDto;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static learn.springws.restfulws.shared.Utils.*;
 
+@Slf4j
 @RestController
 @RequestMapping("users")
 public class UserController {
@@ -53,14 +55,11 @@ public class UserController {
         if (anyFieldIsMissing(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword())) {
             throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD);
         }
-        UserRest returnUser = new UserRest();
         ModelMapper mapper = new ModelMapper();
         UserDto dto = mapper.map(user, UserDto.class);
-//        BeanUtils.copyProperties(user, dto);
-        /*
         UserDto created = userService.createUser(dto);
-        BeanUtils.copyProperties(created, returnUser);
-        */
+        UserRest returnUser = mapper.map(created, UserRest.class);
+        log.debug("Created User with public ID {}", returnUser.getUserId());
         return returnUser;
     }
 
