@@ -3,14 +3,14 @@ package learn.springws.restfulws.rest.controller;
 import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.rest.model.OperationName;
 import learn.springws.restfulws.rest.model.request.UserDetailsRequestModel;
-import learn.springws.restfulws.rest.model.response.ErrorMessages;
-import learn.springws.restfulws.rest.model.response.OperationStatus;
-import learn.springws.restfulws.rest.model.response.OperationResult;
-import learn.springws.restfulws.rest.model.response.UserRest;
+import learn.springws.restfulws.rest.model.response.*;
+import learn.springws.restfulws.service.AddressService;
 import learn.springws.restfulws.service.UserService;
+import learn.springws.restfulws.shared.dto.AddressDto;
 import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +24,11 @@ import static learn.springws.restfulws.shared.Utils.*;
 public class UserController {
 
     private final UserService userService;
+    private final AddressService addressService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AddressService addressService) {
         this.userService = userService;
+        this.addressService = addressService;
     }
 
     @GetMapping
@@ -80,5 +82,12 @@ public class UserController {
     private UserDto requestModelToDto(UserDetailsRequestModel requestModel) {
         ModelMapper mapper = new ModelMapper();
         return mapper.map(requestModel, UserDto.class);
+    }
+
+    @GetMapping("/{userPublicId}/addresses")
+    public List<AddressRest> getAddressesForUser(@PathVariable String userPublicId) {
+        List<AddressDto> addresses = addressService.getAddresses(userPublicId);
+        java.lang.reflect.Type typeOfList = new TypeToken<List<AddressRest>>() {}.getType();
+        return new ModelMapper().map(addresses, typeOfList);
     }
 }
