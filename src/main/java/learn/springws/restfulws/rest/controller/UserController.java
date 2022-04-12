@@ -11,7 +11,6 @@ import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,19 +34,13 @@ public class UserController {
                                    @RequestParam(value = "limit", defaultValue = "5") int limit) {
         page = page - 1; // number of page starts from 0, not from 1 (zero indexing)
         List<UserDto> usersDto = userService.getUsers(page, limit);
-        return usersDto.stream().map(dto -> {
-            UserRest user = new UserRest();
-            BeanUtils.copyProperties(dto, user);
-            return user;
-        }).collect(Collectors.toList());
+        return usersDto.stream().map(this::dtoToRest).collect(Collectors.toList());
     }
 
     @GetMapping("/{userPublicId}")
     public UserRest getUser(@PathVariable String userPublicId) {
         UserDto dto = userService.getUserByPublicId(userPublicId);
-        ModelMapper mapper = new ModelMapper();
-        UserRest returnUser = mapper.map(dto, UserRest.class);
-        return returnUser;
+        return dtoToRest(dto);
     }
 
     @PostMapping
@@ -68,17 +61,24 @@ public class UserController {
         if (anyFieldIsMissing(user.getFirstName(), user.getLastName())) {
             throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD);
         }
-        UserDto dto = new UserDto();
-        BeanUtils.copyProperties(user, dto);
+        UserDto dto = requestModelToDto(user);
         UserDto updated = userService.updateUser(userPublicId, dto);
-        UserRest returnUser = new UserRest();
-        BeanUtils.copyProperties(updated, returnUser);
-        return returnUser;
+        return dtoToRest(updated);
     }
 
     @DeleteMapping("/{userPublicId}")
     public OperationStatus deleteUser(@PathVariable String userPublicId) {
         userService.deleteUser(userPublicId);
         return new OperationStatus(OperationResult.SUCCESS, OperationName.DELETE);
+    }
+
+    private UserRest dtoToRest(UserDto dto) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(dto, UserRest.class);
+    }
+
+    private UserDto requestModelToDto(UserDetailsRequestModel requestModel) {
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(requestModel, UserDto.class);
     }
 }
