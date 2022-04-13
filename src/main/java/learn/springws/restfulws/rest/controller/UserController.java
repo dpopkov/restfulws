@@ -99,16 +99,15 @@ public class UserController {
     public EntityModel<AddressRest> getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
         AddressDto dto = addressService.getAddress(addressPublicId);
         AddressRest address = new ModelMapper().map(dto, AddressRest.class);
-        Link userLink = WebMvcLinkBuilder.linkTo(UserController.class).slash(userPublicId).withRel("user");
-        Link userAddressesLink = WebMvcLinkBuilder.linkTo(UserController.class)
-                .slash(userPublicId)
-                .slash("addresses")
-                .withRel("addresses");
-        Link selfLink = WebMvcLinkBuilder.linkTo(UserController.class)
-                .slash(userPublicId)
-                .slash("addresses")
-                .slash(addressPublicId)
-                .withSelfRel();
+        Link userLink = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(UserController.class).getUser(userPublicId)
+        ).withRel("user");
+        Link userAddressesLink = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(UserController.class).getAddressesForUser(userPublicId)
+        ).withRel("addresses");
+        Link selfLink = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(UserController.class).getAddress(userPublicId, addressPublicId)
+        ).withSelfRel();
         return EntityModel.of(address, Arrays.asList(userLink, userAddressesLink, selfLink));
     }
 }
