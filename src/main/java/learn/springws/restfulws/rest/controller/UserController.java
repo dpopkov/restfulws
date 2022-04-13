@@ -11,10 +11,10 @@ import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,20 +89,24 @@ public class UserController {
     }
 
     @GetMapping("/{userPublicId}/addresses")
-    public List<AddressRest> getAddressesForUser(@PathVariable String userPublicId) {
-        List<AddressDto> addresses = addressService.getAddresses(userPublicId);
+    public CollectionModel<AddressRest> getAddressesForUser(@PathVariable String userPublicId) {
+        List<AddressDto> addressesDto = addressService.getAddresses(userPublicId);
         java.lang.reflect.Type typeOfList = new TypeToken<List<AddressRest>>() {}.getType();
-        return new ModelMapper().map(addresses, typeOfList);
+        final List<AddressRest> addresses = new ModelMapper().map(addressesDto, typeOfList);
+        return CollectionModel.of(addresses,
+                linkTo(methodOn(UserController.class).getUser(userPublicId)).withRel("user"),
+                linkTo(methodOn(UserController.class).getAddressesForUser(userPublicId)).withSelfRel()
+        );
     }
 
     @GetMapping("/{userPublicId}/addresses/{addressPublicId}")
     public EntityModel<AddressRest> getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
         AddressDto dto = addressService.getAddress(addressPublicId);
         AddressRest address = new ModelMapper().map(dto, AddressRest.class);
-        return EntityModel.of(address, Arrays.asList(
+        return EntityModel.of(address,
                 linkTo(methodOn(UserController.class).getUser(userPublicId)).withRel("user"),
                 linkTo(methodOn(UserController.class).getAddressesForUser(userPublicId)).withRel("addresses"),
                 linkTo(methodOn(UserController.class).getAddress(userPublicId, addressPublicId)).withSelfRel()
-        ));
+        );
     }
 }
