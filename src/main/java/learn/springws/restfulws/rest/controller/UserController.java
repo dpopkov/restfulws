@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -21,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static learn.springws.restfulws.shared.Utils.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Slf4j
 @RestController
@@ -99,15 +99,10 @@ public class UserController {
     public EntityModel<AddressRest> getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
         AddressDto dto = addressService.getAddress(addressPublicId);
         AddressRest address = new ModelMapper().map(dto, AddressRest.class);
-        Link userLink = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(UserController.class).getUser(userPublicId)
-        ).withRel("user");
-        Link userAddressesLink = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(UserController.class).getAddressesForUser(userPublicId)
-        ).withRel("addresses");
-        Link selfLink = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(UserController.class).getAddress(userPublicId, addressPublicId)
-        ).withSelfRel();
-        return EntityModel.of(address, Arrays.asList(userLink, userAddressesLink, selfLink));
+        return EntityModel.of(address, Arrays.asList(
+                linkTo(methodOn(UserController.class).getUser(userPublicId)).withRel("user"),
+                linkTo(methodOn(UserController.class).getAddressesForUser(userPublicId)).withRel("addresses"),
+                linkTo(methodOn(UserController.class).getAddress(userPublicId, addressPublicId)).withSelfRel()
+        ));
     }
 }
