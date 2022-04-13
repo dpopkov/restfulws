@@ -11,6 +11,8 @@ import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -94,6 +96,20 @@ public class UserController {
     @GetMapping("/{userPublicId}/addresses/{addressPublicId}")
     public AddressRest getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
         AddressDto dto = addressService.getAddress(addressPublicId);
-        return new ModelMapper().map(dto, AddressRest.class);
+        AddressRest address = new ModelMapper().map(dto, AddressRest.class);
+        Link userLink = WebMvcLinkBuilder.linkTo(UserController.class).slash(userPublicId).withRel("user");
+        Link userAddressesLink = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(userPublicId)
+                .slash("addresses")
+                .withRel("addresses");
+        Link selfLink = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(userPublicId)
+                .slash("addresses")
+                .slash(addressPublicId)
+                .withSelfRel();
+        address.add(userLink);
+        address.add(userAddressesLink);
+        address.add(selfLink);
+        return address;
     }
 }
