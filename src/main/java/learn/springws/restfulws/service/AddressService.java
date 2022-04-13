@@ -7,4 +7,6 @@ import java.util.List;
 public interface AddressService {
 
     List<AddressDto> getAddresses(String userPublicId);
+
+    AddressDto getAddress(String addressPublicId);
 }

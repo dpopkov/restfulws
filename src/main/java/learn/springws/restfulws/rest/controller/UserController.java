@@ -90,4 +90,10 @@ public class UserController {
         java.lang.reflect.Type typeOfList = new TypeToken<List<AddressRest>>() {}.getType();
         return new ModelMapper().map(addresses, typeOfList);
     }
+
+    @GetMapping("/{userPublicId}/addresses/{addressPublicId}")
+    public AddressRest getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
+        AddressDto dto = addressService.getAddress(addressPublicId);
+        return new ModelMapper().map(dto, AddressRest.class);
+    }
 }

@@ -2,7 +2,9 @@ package learn.springws.restfulws.service.impl;
 
 import learn.springws.restfulws.data.entity.AddressEntity;
 import learn.springws.restfulws.data.entity.UserEntity;
+import learn.springws.restfulws.data.repository.AddressRepository;
 import learn.springws.restfulws.data.repository.UserRepository;
+import learn.springws.restfulws.exceptions.AddressServiceException;
 import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.rest.model.response.ErrorMessages;
 import learn.springws.restfulws.service.AddressService;
@@ -18,9 +20,11 @@ import java.util.List;
 public class AddressServiceImpl implements AddressService {
 
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
-    public AddressServiceImpl(UserRepository userRepository) {
+    public AddressServiceImpl(UserRepository userRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
     }
 
     @Override
@@ -33,5 +37,12 @@ public class AddressServiceImpl implements AddressService {
         }
         Type typeOfList = new TypeToken<List<AddressDto>>() {}.getType();
         return new ModelMapper().map(addresses, typeOfList);
+    }
+
+    @Override
+    public AddressDto getAddress(String addressPublicId) {
+        AddressEntity entity = addressRepository.findByPublicId(addressPublicId)
+                .orElseThrow(() -> new AddressServiceException(ErrorMessages.NO_RECORD_FOUND));
+        return new ModelMapper().map(entity, AddressDto.class);
     }
 }
