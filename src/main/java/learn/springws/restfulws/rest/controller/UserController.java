@@ -11,10 +11,12 @@ import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping("/{userPublicId}/addresses/{addressPublicId}")
-    public AddressRest getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
+    public EntityModel<AddressRest> getAddress(@PathVariable String userPublicId, @PathVariable String addressPublicId) {
         AddressDto dto = addressService.getAddress(addressPublicId);
         AddressRest address = new ModelMapper().map(dto, AddressRest.class);
         Link userLink = WebMvcLinkBuilder.linkTo(UserController.class).slash(userPublicId).withRel("user");
@@ -107,9 +109,6 @@ public class UserController {
                 .slash("addresses")
                 .slash(addressPublicId)
                 .withSelfRel();
-        address.add(userLink);
-        address.add(userAddressesLink);
-        address.add(selfLink);
-        return address;
+        return EntityModel.of(address, Arrays.asList(userLink, userAddressesLink, selfLink));
     }
 }
