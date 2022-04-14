@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserByEmail(String email) {
         UserEntity entity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("Cannot find user by email " + email));
+                .orElseThrow(() -> new UserServiceException(ErrorMessages.NO_USER_FOUND));
         return entityToDto(entity);
     }
 
