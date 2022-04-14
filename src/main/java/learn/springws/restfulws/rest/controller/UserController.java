@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Slf4j
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -93,6 +94,11 @@ public class UserController {
         List<AddressDto> addressesDto = addressService.getAddresses(userPublicId);
         java.lang.reflect.Type typeOfList = new TypeToken<List<AddressRest>>() {}.getType();
         final List<AddressRest> addresses = new ModelMapper().map(addressesDto, typeOfList);
+        for (AddressRest address : addresses) {
+            Link link = linkTo(methodOn(UserController.class).getAddress(userPublicId, address.getPublicId()))
+                    .withSelfRel();
+            address.add(link);
+        }
         return CollectionModel.of(addresses,
                 linkTo(methodOn(UserController.class).getUser(userPublicId)).withRel("user"),
                 linkTo(methodOn(UserController.class).getAddressesForUser(userPublicId)).withSelfRel()
