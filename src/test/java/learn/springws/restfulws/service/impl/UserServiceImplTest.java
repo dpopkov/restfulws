@@ -101,4 +101,14 @@ class UserServiceImplTest {
         then(userRepository).should().save(entityCaptor.capture());
         assertEquals(userId, entityCaptor.getValue().getUserId());
     }
+
+    @Test
+    void testCreateUser_whenUserExists_thenThrowException() {
+        // Given
+        given(userRepository.findByEmail(any())).willReturn(Optional.of(new UserEntity()));
+        // Then
+        assertThrows(UserServiceException.class,
+                () -> userService.createUser(new UserDto()),
+                ErrorMessages.USER_ALREADY_EXISTS.getErrorMessage());
+    }
 }
