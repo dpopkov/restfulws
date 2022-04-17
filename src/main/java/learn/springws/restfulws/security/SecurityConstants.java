@@ -8,6 +8,7 @@ public class SecurityConstants {
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String TOKEN_HEADER = "Authorization";
     public static final String SIGN_UP_URL = "/users";
+    public static final String H2_CONSOLE_URL = "/h2-console/**";
 
     public static String getTokenSecret() {
         AppProperties appProperties = RestfulwsApplicationContext.getBean(AppProperties.class);
