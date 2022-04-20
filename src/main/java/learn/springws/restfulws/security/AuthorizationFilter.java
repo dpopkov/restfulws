@@ -34,6 +34,11 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * Extracts from the http request and validates the JWT token.
+     * @param request http request
+     * @return the authentication object which represents a successfully authenticated user's email or null otherwise
+     */
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
         if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {

@@ -9,6 +9,7 @@ import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -31,6 +32,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Performs actual authentication.
+     * Returns a populated authentication token for the authenticated user, indicating
+     * successful authentication.
+     * @param request from which to extract parameters and perform the authentication
+     * @param response the response
+     * @return the authenticated user token.
+     * @throws AuthenticationException if authentication fails.
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
@@ -46,10 +56,20 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     )
             );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BadCredentialsException("Failed to read credentials from request", e);
         }
     }
 
+    /**
+     * Behaviour for successful authentication.
+     * Generates the authorization JWT token that will be used in the authorization flow
+     * and adds it to the 'Authorization' response header.
+     * Adds the user public ID to the 'UserID' response header.
+     * @param request http request
+     * @param response http response
+     * @param chain filter chain
+     * @param authResult the object returned from the <tt>attemptAuthentication</tt> method.
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) {
