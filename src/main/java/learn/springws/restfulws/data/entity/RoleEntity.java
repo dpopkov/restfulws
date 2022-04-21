@@ -1,6 +1,7 @@
 package learn.springws.restfulws.data.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.Collection;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity(name = "roles")
 public class RoleEntity implements Serializable {
     @Id
@@ -26,4 +28,9 @@ public class RoleEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_id", referencedColumnName = "id")})
     private Collection<AuthorityEntity> authorities;
+
+    public RoleEntity(String name, Collection<AuthorityEntity> authorities) {
+        this.name = name;
+        this.authorities = authorities;
+    }
 }
