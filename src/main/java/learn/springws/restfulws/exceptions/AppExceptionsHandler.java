@@ -21,11 +21,13 @@ public class AppExceptionsHandler {
         return responseEntity(ex);
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    // Commented out in order to continue to receive status 403 when user is not authorized,
+    // otherwise it is 500.
+    /*@ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleOtherExceptions(Exception ex, WebRequest request) {
         log.trace("handleOtherExceptions(..) : message = {}", ex.getMessage());
         return responseEntity(ex);
-    }
+    }*/
 
     private ResponseEntity<Object> responseEntity(Exception ex) {
         return new ResponseEntity<>(

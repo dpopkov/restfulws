@@ -14,6 +14,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 
 import static learn.springws.restfulws.shared.Utils.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Slf4j
 @RestController
@@ -73,6 +73,7 @@ public class UserController {
         return dtoToRest(updated);
     }
 
+    @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/{userPublicId}")
     public OperationStatus deleteUser(@PathVariable String userPublicId) {
         userService.deleteUser(userPublicId);
