@@ -4,6 +4,7 @@ import learn.springws.restfulws.data.entity.AddressEntity;
 import learn.springws.restfulws.data.entity.UserEntity;
 import learn.springws.restfulws.data.repository.UserRepository;
 import learn.springws.restfulws.rest.model.response.ErrorMessages;
+import learn.springws.restfulws.security.UserPrincipal;
 import learn.springws.restfulws.service.UserService;
 import learn.springws.restfulws.exceptions.UserServiceException;
 import learn.springws.restfulws.shared.Utils;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -115,8 +115,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Can not find user by email " + email));
-        return new org.springframework.security.core.userdetails.User(
-                userEntity.getEmail(), userEntity.getEncryptedPassword(), Collections.emptyList());
+        return new UserPrincipal(userEntity);
     }
 
     private UserDto entityToDto(UserEntity entity) {
