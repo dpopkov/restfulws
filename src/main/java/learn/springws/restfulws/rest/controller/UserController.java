@@ -15,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class UserController {
         return usersDto.stream().map(this::dtoToRest).collect(Collectors.toList());
     }
 
+    @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.publicId")
     @GetMapping("/{userPublicId}")
     public UserRest getUser(@PathVariable String userPublicId) {
         UserDto dto = userService.getUserByPublicId(userPublicId);
