@@ -15,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,7 +74,8 @@ public class UserController {
         return dtoToRest(updated);
     }
 
-    @Secured({"ROLE_ADMIN"})
+    @PreAuthorize("hasAuthority('DELETE_AUTHORITY')")
+//    @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/{userPublicId}")
     public OperationStatus deleteUser(@PathVariable String userPublicId) {
         userService.deleteUser(userPublicId);
