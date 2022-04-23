@@ -6,6 +6,7 @@ import learn.springws.restfulws.rest.model.request.UserDetailsRequestModel;
 import learn.springws.restfulws.rest.model.response.*;
 import learn.springws.restfulws.service.AddressService;
 import learn.springws.restfulws.service.UserService;
+import learn.springws.restfulws.shared.Roles;
 import learn.springws.restfulws.shared.dto.AddressDto;
 import learn.springws.restfulws.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static learn.springws.restfulws.shared.Utils.*;
@@ -60,6 +62,7 @@ public class UserController {
         }
         ModelMapper mapper = new ModelMapper();
         UserDto dto = mapper.map(user, UserDto.class);
+        dto.setRoles(Set.of(Roles.ROLE_USER.name()));
         UserDto created = userService.createUser(dto);
         UserRest returnUser = mapper.map(created, UserRest.class);
         log.debug("Created User with public ID {}", returnUser.getUserId());

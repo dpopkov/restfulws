@@ -37,7 +37,7 @@ public class UserPrincipal implements UserDetails {
             }
             roleAuthorities.forEach(authority -> authorityNames.add(authority.getName()));
         }
-        return authorityNames.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return authorityNames.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
     }
 
     public String getPublicId() {

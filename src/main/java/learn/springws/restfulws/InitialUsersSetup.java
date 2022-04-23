@@ -6,6 +6,7 @@ import learn.springws.restfulws.data.entity.UserEntity;
 import learn.springws.restfulws.data.repository.AuthorityRepository;
 import learn.springws.restfulws.data.repository.RoleRepository;
 import learn.springws.restfulws.data.repository.UserRepository;
+import learn.springws.restfulws.shared.Roles;
 import learn.springws.restfulws.shared.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -51,8 +52,8 @@ public class InitialUsersSetup {
         AuthorityEntity read = createAuthority("READ_AUTHORITY");
         AuthorityEntity write = createAuthority("WRITE_AUTHORITY");
         AuthorityEntity delete = createAuthority("DELETE_AUTHORITY");
-        RoleEntity roleUser = createRole("ROLE_USER", List.of(read, write));
-        RoleEntity roleAdmin = createRole("ROLE_ADMIN", List.of(read, write, delete));
+        createRole(Roles.ROLE_USER.name(), List.of(read, write));
+        RoleEntity roleAdmin = createRole(Roles.ROLE_ADMIN.name(), List.of(read, write, delete));
         createUser("admin", "admin", "admin@example.org", "admin", roleAdmin);
         System.out.println(">>>>>>>>>>>>>>>>>> InitialUsersSetup::onApplicationEvent: admin user created");
     }

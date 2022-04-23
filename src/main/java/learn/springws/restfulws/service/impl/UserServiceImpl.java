@@ -1,7 +1,9 @@
 package learn.springws.restfulws.service.impl;
 
 import learn.springws.restfulws.data.entity.AddressEntity;
+import learn.springws.restfulws.data.entity.RoleEntity;
 import learn.springws.restfulws.data.entity.UserEntity;
+import learn.springws.restfulws.data.repository.RoleRepository;
 import learn.springws.restfulws.data.repository.UserRepository;
 import learn.springws.restfulws.rest.model.response.ErrorMessages;
 import learn.springws.restfulws.security.UserPrincipal;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,11 +32,13 @@ public class UserServiceImpl implements UserService {
     private static final int PUBLIC_USER_ID_LENGTH = 32;
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final Utils utils;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, Utils utils, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, Utils utils, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.utils = utils;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -64,6 +69,15 @@ public class UserServiceImpl implements UserService {
                 addressEntity.setPublicId(utils.generatePublicId());
             }
         }
+
+        // Set Roles
+        List<RoleEntity> roles = new ArrayList<>();
+        for (String role : dto.getRoles()) {
+            RoleEntity roleEntity = roleRepository.findByName(role).orElseThrow();
+            roles.add(roleEntity);
+        }
+        entity.setRoles(roles);
+
         UserEntity storedUser = userRepository.save(entity);
         return mapper.map(storedUser, UserDto.class);
     }
