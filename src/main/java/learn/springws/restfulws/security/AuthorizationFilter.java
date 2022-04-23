@@ -58,7 +58,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 // todo: it would be better not to get authorities from the database on every authorization (m.b. use JWT)
                 Optional<UserEntity> byEmail = userRepository.findByEmail(emailAsUsername);
                 UserPrincipal userPrincipal = new UserPrincipal(byEmail.orElseThrow());
-                return new UsernamePasswordAuthenticationToken(emailAsUsername, null,
+                return new UsernamePasswordAuthenticationToken(userPrincipal, null,
                         userPrincipal.getAuthorities());
             }
         }

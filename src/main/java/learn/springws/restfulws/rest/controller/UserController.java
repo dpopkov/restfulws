@@ -74,7 +74,11 @@ public class UserController {
         return dtoToRest(updated);
     }
 
-    @PreAuthorize("hasAuthority('DELETE_AUTHORITY')")
+    /* Example of @PreAuthorize with hasRole and principal: */
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userPublicId == principal.publicId")
+    /* Example of @PreAuthorize with hasAuthority: */
+//    @PreAuthorize("hasAuthority('DELETE_AUTHORITY')")
+    /* Example of @Secured with role: */
 //    @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/{userPublicId}")
     public OperationStatus deleteUser(@PathVariable String userPublicId) {

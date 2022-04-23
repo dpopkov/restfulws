@@ -15,10 +15,12 @@ public class UserPrincipal implements UserDetails {
     private final String username;
     private final String password;
     private final Collection<GrantedAuthority> authorities;
+    private final String publicId;
 
     public UserPrincipal(UserEntity userEntity) {
         username = userEntity.getEmail();   // email is used as username
         password = userEntity.getEncryptedPassword();
+        publicId = userEntity.getUserId();
         authorities = initAuthorities(userEntity.getRoles());
     }
 
@@ -36,6 +38,10 @@ public class UserPrincipal implements UserDetails {
             roleAuthorities.forEach(authority -> authorityNames.add(authority.getName()));
         }
         return authorityNames.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public String getPublicId() {
+        return publicId;
     }
 
     @Override
